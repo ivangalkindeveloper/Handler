@@ -22,15 +22,6 @@ dependencies: [
 ]
 ```
 
-# API
-```priority``` - 
-```onDefer``` - 
-```onSuccess / onMainSuccess``` - 
-```onApiError / onMainApiError``` - 
-```onConnectionError / onMainConnectionError``` - 
-```onUnknownError / onMainUnknownError``` - 
-Methods that contains 'Main' in their name work within the MainActor.
-
 # Usage
 Easy to use when interacting with remote data sources:
 ```swift
@@ -43,7 +34,7 @@ final class MyViewModel: Handler<HttpApiError, HttpConnectionError>  {
     private let repository = ProfileRepository()
     
     func fetchProfile() {
-        handle(
+        self.handle(
             {
                 self.repository.getProfile()
             },
@@ -55,6 +46,24 @@ final class MyViewModel: Handler<HttpApiError, HttpConnectionError>  {
             }
         )
     }
+}
+```
+
+# API
+```priority``` - task execution priority;\
+```onDefer``` - callback triggered in the defer section;\
+```onSuccess``` / ```onMainSuccess``` - callback triggered ass success result of execution;\
+```onApiError``` / ```onMainApiError``` - callback triggered when ApiError type match;\
+```onConnectionError``` / ```onMainConnectionError``` - callback triggered when ConnectionError match;\
+```onUnknownError``` / ```onMainUnknownError``` - callback triggered when an unknown error occurs.\
+Methods that contains 'Main' in their name work within the MainActor.
+
+# HandlerObserver
+HandlerObserver - a class with a static field onError, which is called inside the handle to notify globally about errors.
+This is useful for centralizing all errors to error analytics.
+```swift
+HandlerObserver.onError = { error in
+    MyCrushlytics.sendError(error)
 }
 ```
 

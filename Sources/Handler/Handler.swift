@@ -1,6 +1,8 @@
 // The Swift Programming Language
 // https://docs.swift.org/swift-book
 
+
+
 // MARK: - Class
 
 public final class Handler<ApiError: Error, ConnectionError: Error>: HandlerProtocol {
@@ -22,7 +24,7 @@ public extension Handler {
         onMainConnectionError: VoidErrorCollback? = nil,
         onUnknownError: VoidErrorCollback? = nil,
         onMainUnknownError: VoidErrorCollback? = nil,
-    ) -> Task<Void, Never>? {
+    ) -> Task<Void, Never>? {        
         let task = Task(
             priority: priority
         ) {
@@ -65,7 +67,7 @@ public extension Handler {
         self.lastTask?.isCancelled
     }
 
-    func cancelLastTask() {
+    func cancelLastTask() -> Void {
         self.lastTask?.cancel()
         self.lastTask = nil
     }

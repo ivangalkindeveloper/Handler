@@ -7,6 +7,6 @@
 
 // MARK: - Observer
 
-public enum HandlerObserver {
+public final class HandlerObserver {
     nonisolated(unsafe) static var onError: ((Error) -> Void)?
 }
