@@ -5,6 +5,8 @@
 
 open class Handler<ApiError: Error, ConnectionError: Error>: HandlerProtocol {
     public var lastTask: Task<Void, Never>?
+    
+    public init() {}
 }
 
 // MARK: - Public methods
