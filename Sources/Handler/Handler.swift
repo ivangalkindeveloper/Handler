@@ -1,11 +1,9 @@
 // The Swift Programming Language
 // https://docs.swift.org/swift-book
 
-
-
 // MARK: - Class
 
-public final class Handler<ApiError: Error, ConnectionError: Error>: HandlerProtocol {
+public class Handler<ApiError: Error, ConnectionError: Error>: HandlerProtocol {
     public var lastTask: Task<Void, Never>?
 }
 
