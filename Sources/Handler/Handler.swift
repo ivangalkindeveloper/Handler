@@ -3,7 +3,7 @@
 
 // MARK: - Class
 
-public class Handler<ApiError: Error, ConnectionError: Error>: HandlerProtocol {
+open class Handler<ApiError: Error, ConnectionError: Error>: HandlerProtocol {
     public var lastTask: Task<Void, Never>?
 }
 
