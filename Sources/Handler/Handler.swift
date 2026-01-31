@@ -12,6 +12,7 @@ open class Handler<ApiError: Error, ConnectionError: Error>: HandlerProtocol {
 // MARK: - Public methods
 
 public extension Handler {
+    @discardableResult
     func handle<T: Sendable>(
         _ execute: @escaping () async throws -> T,
         priority: TaskPriority? = nil,

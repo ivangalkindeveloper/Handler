@@ -20,7 +20,7 @@ public protocol HandlerProtocol {
         onUnknownError: VoidErrorCollback?,
         onMainUnknownError: VoidErrorCollback?,
     ) -> Task<Void, Never>?
-    
+
     var isLastTaskCancelled: Bool? { get }
 
     func cancelLastTask() -> Void
