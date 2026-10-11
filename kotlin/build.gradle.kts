@@ -4,5 +4,5 @@ plugins {
 
 allprojects {
     group = "io.ivangalkindeveloper"
-    version = "1.0.0"
+    version = "2.0.0"
 }

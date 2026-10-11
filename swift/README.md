@@ -11,7 +11,7 @@ Requires Swift 6.1+, iOS 13+ or macOS 10.15+. Add the package using Swift Packag
 ```swift
 .package(
     url: "https://github.com/ivangalkindeveloper/Handler.git",
-    branch: "master"
+    from: "2.0.0"
 )
 ```
 

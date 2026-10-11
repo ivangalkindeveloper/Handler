@@ -16,7 +16,7 @@ Add `mavenLocal()` to `dependencyResolutionManagement.repositories` in your appl
 
 ```kotlin
 dependencies {
-    implementation("io.ivangalkindeveloper:handler:1.0.0")
+    implementation("io.ivangalkindeveloper:handler:2.0.0")
     // Add this if viewModelScope is not already available:
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")
 }

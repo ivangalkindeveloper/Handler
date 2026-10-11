@@ -15,7 +15,7 @@ dependencies:
   bloc_handler:
     git:
       url: https://github.com/ivangalkindeveloper/Handler.git
-      ref: master
+      ref: v2.0.0
       path: flutter
 ```
 
