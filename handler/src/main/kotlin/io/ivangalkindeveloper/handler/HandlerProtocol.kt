@@ -1,4 +1,4 @@
-package io.github.ivangalkindeveloper.handler
+package io.ivangalkindeveloper.handler
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job

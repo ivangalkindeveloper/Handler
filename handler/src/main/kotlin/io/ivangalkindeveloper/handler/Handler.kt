@@ -1,4 +1,4 @@
-package io.github.ivangalkindeveloper.handler
+package io.ivangalkindeveloper.handler
 
 import kotlin.reflect.KClass
 import kotlinx.coroutines.CancellationException

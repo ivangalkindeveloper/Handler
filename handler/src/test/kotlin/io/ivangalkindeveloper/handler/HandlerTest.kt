@@ -1,4 +1,4 @@
-package io.github.ivangalkindeveloper.handler
+package io.ivangalkindeveloper.handler
 
 import kotlin.test.*
 import java.util.concurrent.Executors

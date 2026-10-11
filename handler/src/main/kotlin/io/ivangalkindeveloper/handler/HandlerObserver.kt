@@ -1,4 +1,4 @@
-package io.github.ivangalkindeveloper.handler
+package io.ivangalkindeveloper.handler
 
 /** Global error hook, intended for analytics. Called before per-operation error callbacks. */
 object HandlerObserver {

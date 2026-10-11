@@ -14,7 +14,7 @@
 
 ```kotlin
 dependencies {
-    implementation("io.github.ivangalkindeveloper:handler:1.0.0")
+    implementation("io.ivangalkindeveloper:handler:1.0.0")
     // Если viewModelScope ещё не подключён:
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")
 }
@@ -27,7 +27,7 @@ dependencies {
 ```kotlin
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.github.ivangalkindeveloper.handler.Handler
+import io.ivangalkindeveloper.handler.Handler
 
 class HttpApiError : Exception()
 class HttpConnectionError : Exception()
