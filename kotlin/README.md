@@ -1,30 +1,30 @@
-# Handler для Kotlin / Android
+# Handler for Kotlin / Android
 
-Эта реализация находится в общем репозитории Handler. [Обзор проекта и Swift-версия](../README.md). Все команды ниже выполняются из каталога `kotlin/`; открывайте его в Android Studio.
+Run asynchronous operations with success callbacks, categorized error callbacks, main-thread callbacks, cleanup, global error reporting, and cancellation of the latest operation. The library is a JVM JAR using Kotlin Coroutines.
 
-Порт Swift-пакета `Handler`: асинхронная операция, callback результата, классификация ошибок, callbacks на главном потоке, `onDefer`, глобальный `HandlerObserver`, ссылка на последнюю задачу и её отмена. Библиотека поставляется как JVM JAR и работает в Android с Kotlin Coroutines.
+[Platform comparison](../README.md). Run all commands below from this `kotlin/` directory.
 
-## Сборка и подключение
+## Installation
 
-Требуется JDK 17. Gradle Wrapper включён в репозиторий. Используются Kotlin 2.2.21 и Coroutines 1.10.2; байткод совместим с Java 8. Проверка и публикация в локальный Maven:
+Build with JDK 17 and the included Gradle Wrapper. The project uses Kotlin 2.2.21 and Coroutines 1.10.2, with Java 8 bytecode.
 
 ```sh
 ./gradlew test publishToMavenLocal
 ```
 
-В `settings.gradle.kts` Android-проекта добавьте `mavenLocal()` в `dependencyResolutionManagement.repositories`, сохранив `google()` и `mavenCentral()`. Затем:
+Add `mavenLocal()` to `dependencyResolutionManagement.repositories` in your application's `settings.gradle.kts`, alongside `google()` and `mavenCentral()`:
 
 ```kotlin
 dependencies {
     implementation("io.ivangalkindeveloper:handler:1.0.0")
-    // Если viewModelScope ещё не подключён:
+    // Add this if viewModelScope is not already available:
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")
 }
 ```
 
-Можно подключить исходники через `includeBuild("/absolute/path/to/Handler/kotlin")` в settings вместо локальной публикации; строка зависимости остаётся той же.
+To consume the sources instead, add `includeBuild("/absolute/path/to/Handler/kotlin")` to the application's settings and keep the same dependency coordinate. Remote Maven publishing requires separate repository and credential configuration.
 
-## Использование в ViewModel
+## ViewModel usage
 
 ```kotlin
 import androidx.lifecycle.ViewModel
@@ -60,42 +60,47 @@ class ProfileViewModel(private val repository: ProfileRepository) : ViewModel() 
 }
 ```
 
-Для Compose состояние результата можно хранить в `mutableStateOf`, для остальных экранов — в `StateFlow`. `Handler` не навязывает способ хранения состояния.
+Use `mutableStateOf` for observable Compose state or expose a `StateFlow` to your UI. Handler does not prescribe a state-storage mechanism.
 
-Наследование тоже поддерживается: `class MyHandler(scope: CoroutineScope) : Handler<HttpApiError, HttpConnectionError>(scope, HttpApiError::class, HttpConnectionError::class)`. Фабрика `handler<HttpApiError, HttpConnectionError>(scope)` позволяет не передавать `KClass` вручную.
+Subclassing is supported:
 
-## API и порядок callbacks
+```kotlin
+class MyHandler(scope: CoroutineScope) : Handler<HttpApiError, HttpConnectionError>(
+    scope, HttpApiError::class, HttpConnectionError::class
+)
+```
 
-| Swift | Kotlin |
-|---|---|
-| `Task<Void, Never>` | `Job`, возвращаемый `handle` |
-| `TaskPriority` | `dispatcher` для конкретной операции |
-| `MainActor.run` | `withContext(mainDispatcher)` |
-| `lastTask`, `isLastTaskCancelled`, `cancelLastTask` | Те же имена |
-| `ResultErrorCallback`, `VoidErrorCollback` | Сохранены; также есть исправленное имя `VoidErrorCallback` |
+The `handler<HttpApiError, HttpConnectionError>(scope)` factory infers the error classes.
 
-Успех: `execute → onSuccess → onMainSuccess → onDefer`.
+## Callbacks and dispatchers
 
-Ошибка: `execute → onDefer → HandlerObserver.onError → onApiError/onConnectionError/onUnknownError → соответствующий onMain...`. Подклассы ошибок распознаются; при пересечении типов приоритет у API-ошибки, как в Swift. Callback ошибки получает исходный `Throwable`.
+Success order: `execute → onSuccess → onMainSuccess → onDefer`.
+
+Error order: `execute → onDefer → HandlerObserver.onError → onApiError/onConnectionError/onUnknownError → corresponding onMain...`.
+
+Error subclasses are recognized. When an error matches both configured types, API-error handling takes precedence. Callbacks receive the original throwable.
 
 ```kotlin
 HandlerObserver.onError = { error -> analytics.record(error) }
-// Удаление глобального обработчика:
-HandlerObserver.onError = null
+HandlerObserver.onError = null // Remove the global observer.
 ```
 
-`execute`, обычные callbacks, observer и `onDefer` выполняются на `executionDispatcher` (`Dispatchers.Default` по умолчанию), а `onMain...` — на `Dispatchers.Main.immediate`. Для блокирующего IO передайте `dispatcher = Dispatchers.IO`. У Kotlin Coroutines нет прямого аналога приоритета Swift Task; dispatcher выбирает место выполнения, а не приоритет ОС. Dispatcher главного потока можно подменить при тестировании.
+`execute`, ordinary callbacks, the observer, and `onDefer` run on `executionDispatcher`, which defaults to `Dispatchers.Default`. The `onMain...` callbacks use `Dispatchers.Main.immediate`. Pass `dispatcher = Dispatchers.IO` to `handle` for blocking IO. Inject `mainDispatcher` when testing or using the library outside Android.
 
-Scope задаёт время жизни всех задач. Новая операция не отменяет предыдущую. `cancelLastTask()` отменяет только последнюю и очищает ссылку; после этого `isLastTaskCancelled == null`. Можно отменить возвращённый `Job` напрямую — тогда ссылка остаётся и свойство показывает `true`.
+`handle` returns a `Job`. The supplied scope owns all operations; starting a new operation does not cancel the previous one. `cancelLastTask()` cancels only the latest job and clears the reference, making `isLastTaskCancelled` return `null`. Cancelling the returned job directly retains the reference, so the property returns `true`.
 
-Отмена кооперативная: suspend-функции должны соблюдать cancellation. `CancellationException` пробрасывается, не уведомляет observer и не вызывает callbacks ошибок. `onDefer` вызывается для начавшейся операции, в том числе при отмене. Если scope уже отменён и тело задачи не запускалось, `onDefer` не вызывается. Фатальные JVM `Error` не преобразуются в ошибки приложения. Callbacks и observer должны завершаться без исключений; исключения из обработчиков ошибок поступают в переданный scope.
+## Cancellation and callback failures
 
-## Проверки
+Cancellation is cooperative. `CancellationException` propagates without invoking the observer or error callbacks. `onDefer` runs for an operation that has started, including when it is cancelled. It does not run if a cancelled scope prevents the body from starting.
 
-Тесты проверяют порядок callbacks, три категории ошибок, подклассы и пересечение типов, фактический поток `onMainSuccess`, отмену и независимость одновременно выполняемых задач. CI выполняет сборку и тесты через GitHub Actions.
+Fatal JVM `Error` instances are not converted into application errors. Callbacks and the observer should not throw; exceptions from error handlers propagate to the supplied scope.
 
-## Репозиторий и публикация
+`ResultErrorCallback`, `VoidErrorCallback`, and the legacy spelling `VoidErrorCollback` are available as callback aliases.
 
-Swift- и Kotlin-реализации размещаются в одном репозитории; Git-команды выполняйте из его корня. Общие GitHub Actions находятся в `../.github/`.
+## Checks
 
-Maven-публикации настроены для `publishToMavenLocal`. Адрес и credentials удалённого Maven-репозитория настраиваются отдельно.
+```sh
+./gradlew test
+```
+
+Tests cover callback ordering, error categories and subclasses, overlapping error types, main-thread delivery, cancellation, and independent concurrent operations.
