@@ -1,4 +1,6 @@
 # Handler
+
+This is the Swift implementation. See the [project overview and Kotlin version](../README.md). The repository root and this directory both support Swift Package Manager.
 Handler for throws closures, uses in Presenter, ViewModel or Controller.\
 Has an extended API closures that are triggered by successful and unsuccessful processing of the main closure.\
 The handler internally creates a Task, which is saved in a local variable, but also gives a reference to it to the main function of starting the processing.
@@ -18,7 +20,7 @@ github "ivangalkindeveloper/Handler"
 For projects with [Swift Package Manager](https://github.com/apple/swift-package-manager):
 ```
 dependencies: [
-    .package(url: "https://github.com/ivangalkindeveloper/Handler.git", from: "master")
+    .package(url: "https://github.com/ivangalkindeveloper/Handler.git", branch: "master")
 ]
 ```
 
