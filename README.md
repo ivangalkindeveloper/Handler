@@ -20,7 +20,7 @@ dependencies {
 }
 ```
 
-Можно подключить исходники через `includeBuild("/absolute/path/to/Kotlin/Handler")` в settings вместо локальной публикации; строка зависимости остаётся той же.
+Можно подключить исходники через `includeBuild("/absolute/path/to/KotlinGitHub/Handler")` в settings вместо локальной публикации; строка зависимости остаётся той же.
 
 ## Использование в ViewModel
 
